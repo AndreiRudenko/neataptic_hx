@@ -94,7 +94,7 @@ class Network {
 	 */
 	public function propagate(_rate:Float, _momentum:Float, _update:Bool, _target:Array<Float>) {
 
-		if (_target != null && _target.length != output) {
+		if (_target == null || _target.length != output) {
 			throw('Output target length should match network output length');
 		}
 

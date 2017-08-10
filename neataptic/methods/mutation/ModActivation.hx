@@ -27,32 +27,9 @@ class ModActivation {
     	Activation.HARD_TANH,
     	Activation.ABSOLUTE,
     	Activation.INVERSE,
-    	Activation.SELU
+        Activation.SELU,
+        
+    	Activation.HARD_LIMIT
 	];
-
-
-	// public static function mutate_node(node:Node) {
-
-	// 	// Can't be the same squash
-	// 	var _squash:IActivator = allowed[(allowed.indexOf(node.squash) + Math.floor(Math.random() * (allowed.length - 1)) + 1) % allowed.length];
-	// 	node.squash = _squash;
-
-	// }
-
-	// public static function mutate_network(network:Network) {
-
- //        // Has no effect on input node, so they are excluded
- //        if (!mutate_output && network.input + network.output == network.nodes.length) {
-	// 		Log._debug('No nodes that allow mutation of activation function');
- //       		return;
- //        }
-
- //        var index = Math.floor(Math.random() * (network.nodes.length - (mutate_output ? 0 : network.output) - network.input) + network.input);
- //        var node = network.nodes[index];
-
- //        node.mutate(mutate_node);
-
-	// }
-
 
 }

@@ -219,9 +219,13 @@ class Neat {
 	/**
 	 * Sorts the population by score
 	 */
-	public function sort():Void {
+	public function sort(_pop:Array<Network> = null):Void {
 
-		population.sort(function (a, b) {
+		if(_pop == null) {
+			_pop = population;
+		}
+
+		_pop.sort(function (a, b) {
 			var sa = a.score != null ? a.score : 0;
 			var sb = b.score != null ? b.score : 0;
 			return Maths.sign0(sb - sa);
@@ -232,15 +236,31 @@ class Neat {
 	/**
 	 * Returns the fittest genome of the current population
 	 */
-	public function get_fittest():Network {
+	public function get_fittest():Network { 
 
 		// Check if evaluated
 		if (population[population.length - 1].score == null) {
 			evaluate();
 		}
 
-		sort();
-		return population[0];
+		// todo: does i need sort current in population array?
+		// sort();
+		// return population[0];
+
+		var _fittest_val:Float = 0;
+		var _pop:Network = null;
+		for (p in population) {
+			if(p.score != null && _fittest_val < p.score) {
+				_fittest_val = p.score;
+				_pop = p;
+			}
+		}
+		
+		if(_pop == null) {
+			_pop = population[0];
+		}
+
+		return _pop;
 
 	}
 
@@ -275,6 +295,7 @@ class Neat {
 		switch (selection) {
 			case SelectionType.power: {
 				if (population[0].score < population[1].score) {
+					// todo: look at get_fittest
 					sort();
 				}
 
