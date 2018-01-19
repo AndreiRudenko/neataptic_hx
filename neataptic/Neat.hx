@@ -30,11 +30,16 @@ class Neat {
 	public var crossover:Array<CrossoverType>;
 
 	public var mutation:Array<MutationType>;
+	public var mutation_selection:Network->MutationType;
 
 	public var template:Network;
 	public var population:Array<Network>;
 
 	public var generation:Int;
+
+	public var maxnodes:Int;
+	public var maxconns:Int;
+	public var maxgates:Int;
 
 
 	public function new(_input:Int, _output:Int, ?_fitness:Network->Float, ?_options:NeatOptions) {
@@ -52,8 +57,12 @@ class Neat {
 		popsize = _options.popsize != null ? _options.popsize : 50;
 		elitism = _options.elitism != null ? _options.elitism : 0;
 		provenance = _options.provenance != null ? _options.provenance : 0;
+		maxnodes = _options.maxnodes != null ? _options.maxnodes : 0x3fffffff;
+		maxconns = _options.maxconns != null ? _options.maxconns : 0x3fffffff;
+		maxgates = _options.maxgates != null ? _options.maxgates : 0x3fffffff;
 		mutation_rate = _options.mutation_rate != null ? _options.mutation_rate : 0.3;
 		mutation_amount = _options.mutation_amount != null ? _options.mutation_amount : 1;
+		mutation_selection = _options.mutation_selection != null ? _options.mutation_selection : selectmutationmethod;
 
 		fitness_population = _options.fitness_population != null ? _options.fitness_population : false;
 
@@ -161,6 +170,34 @@ class Neat {
 	}
 
 	/**
+	 * Selects a random mutation method for a genome according to the parameters
+	 */
+	function selectmutationmethod(genome:Network):MutationType {
+
+		var _mutationmethod:MutationType = mutation[Math.floor(Math.random() * mutation.length)];
+
+		if (_mutationmethod == MutationType.add_node && genome.nodes.length >= maxnodes) {
+			// if (config.warnings) console.warn('maxnodes exceeded!'); // todo
+			trace('maxnodes exceeded!');
+			return MutationType.none;
+		}
+
+		if (_mutationmethod == MutationType.add_conn && genome.connections.length >= maxconns) {
+			// if (config.warnings) console.warn('maxconns exceeded!'); // todo
+			trace('maxconns exceeded!');
+			return MutationType.none;
+		}
+
+		if (_mutationmethod == MutationType.add_gate && genome.gates.length >= maxgates) {
+			// if (config.warnings) console.warn('maxgates exceeded!'); // todo
+			trace('maxgates exceeded!');
+			return MutationType.none;
+		}
+
+		return _mutationmethod;
+	}
+
+	/**
 	 * Mutates the given (or current) population
 	 */
 	public function mutate():Void {
@@ -169,7 +206,7 @@ class Neat {
 		for (p in population) {
 			if (Math.random() <= mutation_rate) {
 				for (_ in 0...mutation_amount) {
-					var _mutation_method = mutation[Math.floor(Math.random() * mutation.length)];
+					var _mutation_method = mutation_selection(p);
 					p.mutate(_mutation_method);
 				}
 			}
@@ -183,6 +220,11 @@ class Neat {
 	public function evaluate():Void { // async?
 
 		if (fitness_population) {
+			if (clear) {
+				for (genome in population) {
+					genome.clear();
+				}
+			}
 			
 			if(fitness != null) {
 				for (genome in population) {
@@ -206,11 +248,6 @@ class Neat {
 					genome.score = fitness(genome);
 				} 
 
-				// else {
-				// 	if(genome.score == null) {
-				// 		genome.score = 0;
-				// 	}
-				// }
 			}
 		}
 
@@ -410,8 +447,12 @@ typedef NeatOptions = {
 	@:optional var fitness_population:Bool;
 	@:optional var mutation_rate:Float;
 	@:optional var mutation_amount:Int;
+	@:optional var maxnodes:Int;
+	@:optional var maxconns:Int;
+	@:optional var maxgates:Int;
 	@:optional var network:Network;
 	@:optional var equal:Bool;
 	@:optional var clear:Bool;
+	@:optional var mutation_selection:Network->MutationType;
 
 }

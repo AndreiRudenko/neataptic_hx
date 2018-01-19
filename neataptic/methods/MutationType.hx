@@ -4,6 +4,7 @@ package neataptic.methods;
 @:keep
 @:enum abstract MutationType(Int) from Int to Int {
 
+    var none                 = -1;
     var add_node             = 0;
     var sub_node             = 1;
     var add_conn             = 2;

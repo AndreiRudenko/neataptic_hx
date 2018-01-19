@@ -51,7 +51,7 @@ class Network {
 		// Create input and output nodes
 		for (i in 0...(input + output)) {
 			var type = (i < input) ? NodeType.input : NodeType.output;
-			nodes.push(new Node(type, nodes.length));
+			nodes.push(new Node(type));
 		}
 		// Connect input nodes with output nodes directly
 		for (i in 0...input) {
@@ -68,7 +68,8 @@ class Network {
 	 */
 	public function activate(_input:Array<Float>, _training:Bool = false):Array<Float> {
 
-		var output:Array<Float> = [];
+		var output:Array<Float> = []; // todo: optimize, pool
+
 		// Activate nodes chronologically
 		var n:Node;
 		for (i in 0...nodes.length) {
@@ -376,7 +377,8 @@ class Network {
 			case MutationType.mod_weight:{
 				var _min:Float = neataptic.methods.mutation.ModWeight.min;
 				var _max:Float = neataptic.methods.mutation.ModWeight.max;
-				var _connection = connections[Math.floor(Math.random() * connections.length)];
+				var _allconnections = connections.concat(selfconns);
+				var _connection = _allconnections[Math.floor(Math.random() * _allconnections.length)];
 				var _modification = Math.random() * (_max - _min) + _min;
 				_connection.weight += _modification;
 			}
@@ -525,6 +527,10 @@ class Network {
 				_node2.bias = _biastemp;
 				_node2.squash = _squashtemp;
 			}
+			default:{
+
+			}
+
 		}
 		
 	}
